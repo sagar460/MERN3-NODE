@@ -8,6 +8,13 @@ const {multer,storage} = require('./middleware/multerConfig')
 const Blog = require('./model/blogModel')
 const upload = multer({storage : storage })
 const fs = require('fs')
+const cors = require('cors')
+
+app.use(cors(
+    {
+        origin : "http://localhost:5173"
+    }
+))
 
 connectToDatabase()
 
@@ -19,7 +26,12 @@ app.get("/",(req,res)=>{
 
 app.post("/blog",upload.single('image'), async (req,res)=>{
    const {title,subtitle,description} = req.body 
-   const filename = req.file.filename 
+   let filename;
+   if(req.file){
+     filename = "http://localhost:3000/" + req.file.filename 
+   }else{
+    filename = "https://cdn.mos.cms.futurecdn.net/i26qpaxZhVC28XRTJWafQS-1200-80.jpeg"
+   }
 
    if(!title || !subtitle || !description){
         return res.status(400).json({
