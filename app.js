@@ -104,7 +104,7 @@ app.patch("/blog/:id", upload.single("image"), async (req, res) => {
   const { title, subtitle, description } = req.body;
   let imageName;
   if (req.file) {
-    imageName = req.file.filename;
+    imageName = "https://mern3-node-y6pb.onrender.com/" + req.file.filename;
     const blog = await Blog.findById(id);
     const oldImageName = blog.image;
 
