@@ -12,11 +12,7 @@ const connectToDatabase = require("./database");
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://digitalpathshala.vercel.app",
-      "https://www.hahahehehuhu.xyz",
-    ],
+    origin: ["http://localhost:5173", "https://myblog-nine-pied.vercel.app"],
   })
 );
 
@@ -32,7 +28,7 @@ app.post("/blog", upload.single("image"), async (req, res) => {
   const { title, subtitle, description } = req.body;
   let filename;
   if (req.file) {
-    filename = "https://mern3-node.onrender.com/" + req.file.filename;
+    filename = "http://localhost:3000/" + req.file.filename;
   } else {
     filename =
       "https://cdn.mos.cms.futurecdn.net/i26qpaxZhVC28XRTJWafQS-1200-80.jpeg";
@@ -55,11 +51,18 @@ app.post("/blog", upload.single("image"), async (req, res) => {
 });
 
 app.get("/blog", async (req, res) => {
-  const blogs = await Blog.find(); // returns array
-  res.status(200).json({
-    message: "Blogs fetched successfully",
-    data: blogs,
-  });
+  try {
+    const blogs = await Blog.find();
+    res.status(200).json({
+      message: "Blogs fetched successfully",
+      data: blogs,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "Failed to fetch blogs",
+      error: error.message,
+    });
+  }
 });
 
 app.get("/blog/:id", async (req, res) => {
@@ -77,6 +80,7 @@ app.get("/blog/:id", async (req, res) => {
     data: blog,
   });
 });
+
 app.delete("/blog/:id", async (req, res) => {
   const id = req.params.id;
   const blog = await Blog.findById(id);
@@ -100,7 +104,7 @@ app.patch("/blog/:id", upload.single("image"), async (req, res) => {
   const { title, subtitle, description } = req.body;
   let imageName;
   if (req.file) {
-    imageName = "https://mern3-node.onrender.com/" + req.file.filename;
+    imageName = req.file.filename;
     const blog = await Blog.findById(id);
     const oldImageName = blog.image;
 
@@ -124,6 +128,8 @@ app.patch("/blog/:id", upload.single("image"), async (req, res) => {
 });
 
 app.use(express.static("./storage"));
+// app.use(express.static(path.join(__dirname, "storage")));
+// app.use("/uploads", express.static("uploads"));
 
 app.listen(process.env.PORT, () => {
   console.log("NodeJs project has started");
